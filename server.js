@@ -1,24 +1,23 @@
-// Main Server Configuration
 const express = require('express');
-const mongoose = require('mongoose');
-const apiRoutes = require('./routes/index');
-const app = express();
+const db = require('./config/connection');
+const routes = require('./routes');
+
+const cwd = process.cwd();
+
 const PORT = process.env.PORT || 3001;
+const app = express();
 
+// Note: not necessary for the Express server to function. This just helps indicate what activity's server is running in the terminal.
+// const activity = cwd.includes('01-Activities')
+//   ? cwd.split('01-Activities')[1]
+//   : cwd;
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(apiRoutes);
-
-mongoose.connect('mongodb://127.0.0.1:27017/social-network');
-
-const db = mongoose.connection;
-
-db.on('error', (err) => {
-  console.error(`MongoDB Connection Error: ${err}`);
-});
+app.use(routes);
 
 db.once('open', () => {
-  console.log('Connected to MongoDB database');
   app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`API server for  running on port ${PORT}!`);
   });
 });
